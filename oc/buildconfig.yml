@@ -1,0 +1,29 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: app-build
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/kungdevz/hybrid-cloud-app-poc.git
+      ref: main
+
+  strategy:
+    dockerStrategy:
+      dockerfilePath: app/Containerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: app:latest
+  triggers:
+    - type: ConfigChange
+
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: app
+spec:
+  lookupPolicy:
+    local: false
