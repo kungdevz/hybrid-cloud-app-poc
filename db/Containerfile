@@ -4,13 +4,11 @@ USER root
 RUN mkdir -p /usr/config
 WORKDIR /usr/config
 
-# Copy the init script and entrypoint
+# Copy the init script (for manual execution if needed)
 COPY ./init-scripts/init.sql /usr/config/init.sql
-COPY ./entrypoint.sh /usr/config/entrypoint.sh
-RUN chmod +x /usr/config/entrypoint.sh
 
 RUN chown -R mssql /usr/config
 USER mssql
 
-# Start SQL Server with initialization
-CMD ["/usr/config/entrypoint.sh"]
+# Start SQL Server
+CMD /opt/mssql/bin/sqlservr

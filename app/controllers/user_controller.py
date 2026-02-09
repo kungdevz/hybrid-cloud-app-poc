@@ -23,8 +23,10 @@ def api_post():
 def api_put(id):
     ''' Update entity by id'''
     body = request.json
-    body['id'] = id
-    res = user_service.put(body)
+    # Remove id from body to avoid accidental update
+    if 'id' in body:
+        del body['id']
+    res = user_service.put(id, body)
     return jsonify(res.as_dict()) if isinstance(res, User) else jsonify(res)
 
 @api.route('/users/<string:id>', methods=['DELETE'])

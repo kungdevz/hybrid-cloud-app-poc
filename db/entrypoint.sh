@@ -7,9 +7,13 @@
 echo "Waiting for SQL Server to start..."
 sleep 30
 
-# Run the initialization script
+# Run the initialization script using the available sqlcmd
 echo "Running initialization script..."
-/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'c2E6U2VjcmV0I1Bhc3MxMjM=' -C -i /usr/config/init.sql
+for i in {1..10}; do
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'c2E6U2VjcmV0I1Bhc3MxMjM=' -C -i /usr/config/init.sql 2>/dev/null && break
+    echo "Attempt $i failed, retrying in 5 seconds..."
+    sleep 5
+done
 
 echo "Database initialization complete."
 

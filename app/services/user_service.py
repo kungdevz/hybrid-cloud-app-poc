@@ -21,20 +21,49 @@ def post(body):
     db.session.commit()
     return user
 
-def put(body):
+def put(id, body):
     '''
     Update entity by id
+    :param id: the entity id
     :param body: request body
     :returns: the updated entity
     '''
-    user = User.query.get(body['id'])
-    if user:
-        user = User(**body)
-        db.session.merge(user)
-        db.session.flush()
-        db.session.commit()
+    try:
+        user_id = int(id)
+    except ValueError:
+        raise NotFound('Invalid user ID format')
+
+    # Use Native SQL to absolutely guarantee control over the UPDATE statement
+    from sqlalchemy import text
+    
+    # Filter body to ensure ID is never in SET clause
+    update_data = {k: v for k, v in body.items() if k.lower() != 'id'}
+    
+    if not update_data:
+        # Nothing to update, just return the user
+        user = User.query.get(user_id)
+        if not user:
+            raise NotFound('no such entity found with id=' + str(id))
         return user
-    raise NotFound('no such entity found with id=' + str(body['id']))
+
+    # Construct dynamic SET clause
+    set_clause = ", ".join([f"{key} = :{key}" for key in update_data.keys()])
+    sql = text(f"UPDATE dbo.users SET {set_clause} WHERE id = :id")
+    
+    # Add ID to parameters for WHERE clause
+    params = update_data.copy()
+    params['id'] = user_id
+    
+    result = db.session.execute(sql, params)
+    
+    if result.rowcount == 0:
+         raise NotFound('no such entity found with id=' + str(id))
+         
+    db.session.commit()
+    
+    # Fetch updated object to return
+    user = User.query.get(user_id)
+    return user
 
 def delete(id):
     '''
