@@ -8,10 +8,11 @@ spec:
     git:
       uri: https://github.com/kungdevz/hybrid-cloud-app-poc.git
       ref: main
+    contextDir: app
 
   strategy:
     dockerStrategy:
-      dockerfilePath: app/Containerfile
+      dockerfilePath: Containerfile
   output:
     to:
       kind: ImageStreamTag

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+  labels:
+    app: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: mssql
+        image: mcr.microsoft.com/azure-sql-edge:latest
+        ports:
+        - containerPort: 1433
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_SA_PASSWORD
+          value: "c2E6U2VjcmV0I1Bhc3MxMjM="
+        - name: MSSQL_PID
+          value: "Developer"
+        securityContext:
+           allowPrivilegeEscalation: true
+           runAsUser: 0
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+spec:
+  selector:
+    app: database
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433

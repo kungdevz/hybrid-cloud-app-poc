@@ -4,8 +4,8 @@ kind: ConfigMap
 metadata:
   name: app-config
 data:
-  DATABASE_URI: "mssql+pyodbc://hybrid_usr:%s=@192.168.66.147:9677/hybrid_poc?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes"
-  DATABASE_PASSWORD: "P@ssw0rd"
+  PROFILE: "test"
+  FLASK_APP: "app.app"
 ---
 
 # App Service
@@ -41,6 +41,13 @@ spec:
         - name: app
           image: image-registry.openshift-image-registry.svc:5000/ks-hybrid-cloud-poc/app:latest
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
           ports:
             - containerPort: 5000
           envFrom:
