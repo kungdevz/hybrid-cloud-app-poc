@@ -23,14 +23,40 @@ app.config['PERMANENT_SESSION_LIFETIME'] = 1800  # 30 minutes
 with open('config.yaml') as f:
     config_obj = yaml.load(f, Loader=yaml.Loader)
 
-# Logic: Priority to Env Var, then Config File
-database_uri = os.getenv('DATABASE_URI')
-database_password = os.getenv('DATABASE_PASSWORD')
-database_url = database_uri % quote_plus(database_password)
+# Profile-based configuration (local, test, production)
+# Priority: SQLALCHEMY_DATABASE_URI env var > PROFILE-based config > default (production)
+profile = os.getenv('PROFILE', os.getenv('APP_PROFILE', 'production')).lower()
 
-if not database_uri or not database_password:
-    database_uri = config_obj.get('DATABASE_URI', '')
-    database_password = config_obj.get('DATABASE_PASSWORD', '')
+# Check for direct SQLALCHEMY_DATABASE_URI override first
+sqlalchemy_database_uri = os.getenv('SQLALCHEMY_DATABASE_URI')
+
+if sqlalchemy_database_uri:
+    # Direct URI from environment (no password substitution needed)
+    database_url = sqlalchemy_database_uri
+else:
+    # Profile-based database configuration
+    database_configs = {
+        'local': {
+            'uri': 'mssql+pyodbc://sa:%s@database:1433/master?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes',
+            'password': 'c2E6U2VjcmV0I1Bhc3MxMjM='
+        },
+        'test': {
+            'uri': 'mssql+pyodbc://sa:%s@database:1433/master?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes',
+            'password': 'c2E6U2VjcmV0I1Bhc3MxMjM='
+        },
+        'production': {
+            'uri': config_obj.get('DATABASE_URI', ''),
+            'password': config_obj.get('DATABASE_PASSWORD', '')
+        }
+    }
+    
+    # Get config for the current profile, fallback to production
+    db_config = database_configs.get(profile, database_configs['production'])
+    
+    # Allow env var override for password
+    database_uri = os.getenv('DATABASE_URI', db_config['uri'])
+    database_password = os.getenv('DATABASE_PASSWORD', db_config['password'])
+    
     database_url = database_uri % quote_plus(database_password)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url

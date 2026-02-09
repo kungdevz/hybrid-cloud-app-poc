@@ -24,8 +24,7 @@ services:
     ports:
       - "8081:5000"
     environment:
-      SQLALCHEMY_DATABASE_URI: 'mssql+pyodbc://sa:c2E6U2VjcmV0I1Bhc3MxMjM=@192.168.66.147:1433/master?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes'
-      DATABASE_PASSWORD:
+      PROFILE: local
     networks:
       - app-network
 
