@@ -1,0 +1,6 @@
+PyYAML
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+pyodbc
+cryptography

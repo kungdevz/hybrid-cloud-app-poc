@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/azure-sql-edge:latest
+
+USER root
+RUN mkdir -p /usr/config
+WORKDIR /usr/config
+
+# Copy the init script
+COPY ./init-scripts/init.sql /usr/config/init.sql
+
+RUN chown -R mssql /usr/config
+USER mssql
+
+# Start SQL Server
+CMD /opt/mssql/bin/sqlservr

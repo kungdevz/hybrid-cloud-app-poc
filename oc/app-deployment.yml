@@ -1,0 +1,61 @@
+# Application Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  DATABASE_URI: "mssql+pyodbc://hybrid_usr:%s=@192.168.66.147:9677/hybrid_poc?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes"
+  DATABASE_PASSWORD: "P@ssw0rd"
+---
+
+# App Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+  selector:
+    app: python-app
+
+---
+
+# App Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+        - name: app
+          image: image-registry.openshift-image-registry.svc:5000/YOUR_PROJECT_NAME/app:latest
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: app-config
+
+---
+# 7. Route (Expose App to Internet)
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: app-route
+spec:
+  to:
+    kind: Service
+    name: app-service
+  port:
+    targetPort: 5000
+
