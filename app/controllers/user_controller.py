@@ -9,9 +9,31 @@ api = Blueprint('users', 'users')
 
 @api.route('/users', methods=['GET'])
 def api_get():
-    ''' Get all entities'''
-    users = user_service.get()
-    return jsonify([user.as_dict() for user in users])
+    ''' Get entities with pagination'''
+    try:
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 100))
+    except ValueError:
+        page = 1
+        limit = 100
+        
+    result = user_service.get(page, limit)
+    
+    return jsonify({
+        'users': [user.as_dict() for user in result['data']],
+        'meta': {
+            'page': result['page'],
+            'limit': result['limit'],
+            'total': result['total'],
+            'pages': result['pages']
+        }
+    })
+
+@api.route('/users/<string:id>', methods=['GET'])
+def api_get_by_id(id):
+    ''' Get entity by id'''
+    user = user_service.get_by_id(id)
+    return jsonify(user.as_dict())
 
 @api.route('/users', methods=['POST'])
 def api_post():

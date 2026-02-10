@@ -328,10 +328,14 @@
                 <h2>Users Database</h2>
 
                 <div class="session-info">
-                    <p><strong>Session Status:</strong> <span id="sessionStatus">Loading...</span></p>
-                    <p><strong>Total Users:</strong> <span id="userCount">0</span></p>
-                    <button class="btn-danger" style="margin-top: 10px; width: 100%;" onclick="clearAllData()">Clear All
-                        Sessions</button>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <p><strong>Total Users:</strong> <span id="userCount">0</span></p>
+                        <p>Page <span id="currentPageDisplay">1</span> of <span id="totalPagesDisplay">1</span></p>
+                    </div>
+                    <div class="user-actions" style="margin-bottom: 10px;">
+                        <button class="btn-secondary" id="prevBtn" onclick="changePage(-1)" disabled>Previous</button>
+                        <button class="btn-secondary" id="nextBtn" onclick="changePage(1)" disabled>Next</button>
+                    </div>
                 </div>
 
                 <div id="usersContainer">
@@ -344,6 +348,9 @@
     <script>
         const API_BASE = '';
         let currentEditingId = null;
+        let currentPage = 1;
+        let totalPages = 1;
+        const LIMIT = 100;
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function () {
@@ -364,31 +371,41 @@
         });
 
         // Load and display users
-        async function loadUsers() {
+        async function loadUsers(page = 1) {
             try {
-                const response = await fetch('/users');
-                const users = await response.json();
+                currentPage = page;
+                const response = await fetch(`/users?page=${page}&limit=${LIMIT}`);
+                const data = await response.json();
 
-                // Store in session
-                await fetch('/api/session/users', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ users })
-                });
+                const users = data.users || [];
+                const meta = data.meta || { total: 0, pages: 1 };
 
-                displayUsers(users);
-                updateSessionStatus('✓ Active', users.length);
+                totalPages = meta.pages;
+
+                // Update pagination UI
+                document.getElementById('currentPageDisplay').textContent = currentPage;
+                document.getElementById('totalPagesDisplay').textContent = totalPages;
+                document.getElementById('prevBtn').disabled = currentPage <= 1;
+                document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+
+                displayUsers(users, meta.total);
             } catch (error) {
                 console.error('Error loading users:', error);
                 showAlert('Error loading users: ' + error.message, 'error');
-                updateSessionStatus('✗ Error', 0);
+            }
+        }
+
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            if (newPage >= 1 && newPage <= totalPages) {
+                loadUsers(newPage);
             }
         }
 
         // Display users in UI
-        function displayUsers(users) {
+        function displayUsers(users, totalCount) {
             const container = document.getElementById('usersContainer');
-            document.getElementById('userCount').textContent = users.length;
+            document.getElementById('userCount').textContent = totalCount;
 
             if (!users || users.length === 0) {
                 container.innerHTML = '<div class="empty-message">No users found. Create one to get started!</div>';
@@ -449,9 +466,13 @@
         // Edit user
         async function editUser(userId) {
             try {
-                const response = await fetch('/users');
-                const users = await response.json();
-                const user = users.find(u => u.id === userId);
+                const response = await fetch(`/users/${userId}`);
+
+                if (!response.ok) {
+                    throw new Error('User not found');
+                }
+
+                const user = await response.json();
 
                 if (user) {
                     document.getElementById('userId').value = user.id;

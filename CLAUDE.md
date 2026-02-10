@@ -68,7 +68,8 @@ Controllers (Blueprints) → Services (Business Logic) → Models (SQLAlchemy OR
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/users` | Get all users |
+| GET | `/users` | Get users (paginated) |
+| GET | `/users/<id>` | Get user by ID |
 | POST | `/users` | Create a user |
 | PUT | `/users/<id>` | Update user by ID |
 | DELETE | `/users/<id>` | Delete user by ID |

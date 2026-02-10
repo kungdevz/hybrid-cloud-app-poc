@@ -21,6 +21,8 @@ services:
       dockerfile: Containerfile
     depends_on:
       - database
+    volumes:
+      - ./app:/app
     ports:
       - "8081:5000"
     environment:

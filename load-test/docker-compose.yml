@@ -4,7 +4,7 @@ services:
     image: grafana/k6:latest
     container_name: k6-load-test
     volumes:
-      - ./load_test.js:/script.js:ro
+      - ./load_test.js:/script.js:ro,z
     command: run --out influxdb=http://influxdb:8086/k6 /script.js
     environment:
       - BASE_URL=${BASE_URL:-http://app-route-ks-hybrid-cloud-poc.apps.rosa.r0r7f1m1d7w4r0m.en6d.p3.openshiftapps.com}
@@ -29,12 +29,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_BASIC_ENABLED=false
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=Sup@erSecretP@ssw03d
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_BASIC_ENABLED=true
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning:z
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:z
     networks:
       - k6-net
 

@@ -3,12 +3,36 @@ from models.user import User
 from config import db
 from werkzeug.exceptions import NotFound
 
-def get():
+def get(page=1, limit=100):
     '''
-    Get all entities
-    :returns: all entity
+    Get all entities with pagination
+    :param page: current page number (1-based)
+    :param limit: items per page
+    :returns: dict with data and pagination info
     '''
-    return User.query.all()
+    query = User.query.order_by(User.id.asc())
+    total = query.count()
+    
+    users = query.offset((page - 1) * limit).limit(limit).all()
+    
+    return {
+        'data': users,
+        'total': total,
+        'page': page,
+        'limit': limit,
+        'pages': (total + limit - 1) // limit
+    }
+
+def get_by_id(id):
+    '''
+    Get entity by id
+    :param id: the entity id
+    :returns: the entity
+    '''
+    user = User.query.get(id)
+    if not user:
+        raise NotFound('no such entity found with id=' + str(id))
+    return user
 
 def post(body):
     '''

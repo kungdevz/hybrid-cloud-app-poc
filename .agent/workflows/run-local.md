@@ -9,7 +9,7 @@ description: Set up and run the application locally
 // turbo
 
 ```bash
-docker-compose up --build
+podman-compose up --build
 ```
 
 Access the app at <http://localhost:8081>
