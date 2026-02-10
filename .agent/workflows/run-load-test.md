@@ -51,7 +51,7 @@ Access Grafana at:
 <http://ec2-43-210-23-187.ap-southeast-7.compute.amazonaws.com:3000>
 
 - **User**: `admin`
-- **Password**: `password`
+- **Password**: `*******`
 
 ## 5. View Logs
 
