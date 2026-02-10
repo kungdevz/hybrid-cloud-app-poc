@@ -1,6 +1,21 @@
-# Hybrid Cloud App POC
+# Hybrid Cloud App POC (Flask + MSSQL + OpenShift)
 
 A Python Flask REST API with MSSQL backend for user management, designed for hybrid cloud deployment with Docker and Red Hat OpenShift.
+
+## 🚨 MANDATORY AGENT INSTRUCTIONS
+
+**BEFORE you start working, READ `RULES.md` for coding standards and project guidelines.**
+
+### Agent Workflow
+
+1. **Understand Context**: Read `CLAUDE.md` and `RULES.md` thoroughly.
+2. **Check Environment**: Verify if you are running locally (`docker-compose`) or on OpenShift (`oc`).
+3. **Choose Workflow**: Check `.agent/workflows/` for predefined tasks:
+    - Need a new feature? ➔ Use `/add-module` workflow.
+    - Need to deploy? ➔ Use `/deploy-openshift` workflow.
+    - Need to run locally? ➔ Use `/run-local` workflow.
+4. **Implement**: Follow the architecture: `Controller` → `Service` → `Model`.
+5. **Verify**: Ensure changes don't break existing functionality (Dashboard, User CRUD).
 
 ## Tech Stack
 
@@ -24,7 +39,9 @@ hybrid-cloud-app-poc/
 ├── db/                     # Database container + init scripts
 ├── oc/                     # OpenShift deployment manifests
 ├── docs/                   # Postman collection for testing
-└── docker-compose.yml      # Local container orchestration
+├── docker-compose.yml      # Local container orchestration
+├── RULES.md                # comprehensive coding standards
+└── README.md               # User onboarding guide
 ```
 
 ## Architecture
@@ -59,7 +76,7 @@ Controllers (Blueprints) → Services (Business Logic) → Models (SQLAlchemy OR
 
 ## Workflows
 
-Use these workflows for common development tasks:
+Use these workflows for common tasks:
 
 - `/add-module` - Add a new feature module (Model + Service + Controller)
 - `/run-local` - Set up and run locally

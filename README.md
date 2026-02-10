@@ -1,63 +1,47 @@
-# Python MySQL Starter Pack
+# Hybrid Cloud App POC
 
-## Prerequisites
-1. Python 3.x
-2. MySQL database
-3. docker & docker-compose
+A Python Flask REST API with MSSQL backend, designed for hybrid cloud deployment on Red Hat OpenShift (ROSA).
 
-## Configuration
+## 🚀 Getting Started
 
-Located under the yaml file.
+### Prerequisites
 
-- **SQLALCHEMY_DATABASE_URI** MySQL db connection url
+- Docker Desktop & `docker-compose`
+- Python 3.9+ (for local development)
+- `oc` CLI (for OpenShift deployment)
 
-the config value can be set through environment variable **SQLALCHEMY_DATABASE_URI**.
+### 🛠 Configuration
 
-## Local Running
+Configuration is managed via `app/config.yaml` (default values) and Environment Variables.
 
-Go to app folder.
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URI` | MSSQL Connection string |
+| `DATABASE_PASSWORD` | DB Password |
+| `PROFILE` | `local`, `test`, or `production` |
 
-Install requirements:
+### 💻 Running Locally
 
-```bash
-pip install -r requirements.txt
-```
+The easiest way to run the application is using Docker Compose, which sets up both the Flask app and the MSSQL Edge database.
 
-you can run flask migration to create table
-
-```bash
-flask db init
-flask db migrate
-flask db upgrade
-```
-or run the db/init-scripts/ddl.sql to create table
-
-
-Run application
-
-```bash
-python app.py
-```
-
-or override with environment variable
-
-```bash
-SQLALCHEMY_DATABASE_URI=xxx python app.py
-```
-
-
-## Docker compose Running
-
-Run:
 ```bash
 docker-compose up --build
 ```
-## OCP Access (Red Hat OpenShift Service on AWS)
 
-Console URL : https://console-openshift-console.apps.rosa.r0r7f1m1d7w4r0m.en6d.p3.openshiftapps.com
+Access the application at: `http://localhost:8081`
 
-User : cluster-admin
+### 📦 Project Structure
 
-## Test and Verification
+- `app/`: Flask Application (Controllers, Services, Models)
+- `db/`: Database initialization scripts
+- `oc/`: OpenShift Kubernetes Manifests
+- `doc/`: API Documentation (Postman)
 
-Import the postman collection in docs folder to test and verify.# python-mysql-rest-api
+### ☁️ Deployment
+
+Deployment is handled via OpenShift manifests in the `oc/` directory.
+See `.agent/workflows/deploy-openshift.md` for details or use the agent to help you deploy.
+
+### 📝 Development Rules
+
+Please refer to [RULES.md](./RULES.md) for coding standards and contribution guidelines.

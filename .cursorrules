@@ -1,0 +1,45 @@
+# AI Coding Assistant Rules
+
+This file is automatically loaded by Cursor/Windsurf/AI IDEs.
+It enforces project rules and coding standards defined in `RULES.md` and `CLAUDE.md`.
+
+## 🚨 MANDATORY CONTEXT
+
+1. **Read Core Docs First**: Always check `CLAUDE.md` and `RULES.md` before starting any task.
+2. **Use Workflows**: Check `.agent/workflows/` for predefined tasks (deploying, adding modules).
+   - `/add-module`: Template for new feature modules.
+   - `/deploy-openshift`: OpenShift deployment steps.
+   - `/run-local`: Local development setup.
+
+## 🛠️ CODE STANDARDS
+
+### Python (Backend)
+- **Style**: PEP 8 compliance.
+- **Type Hints**: Mandatory for function signatures.
+- **Docstrings**: Google style docstrings for classes/functions.
+- **Imports**: Standard > Third-party > Local (sorted).
+- **Structure**: `Controller` (Route) -> `Service` (Business Logic) -> `Model` (Data).
+- **Database**: Use SQLAlchemy ORM exclusively. Snake_case for DB schema.
+
+### JavaScript (Frontend)
+- **Vanilla JS**: No frameworks (React/Vue/Angular) unless explicitly requested.
+- **ES6+**: Use modern syntax (const/let, arrow functions, modules).
+- **CSS**: Use CSS variables for theming.
+
+## 🏗️ FILE STRUCTURE RULES
+
+- `app/controllers/`: Flask Blueprints (ROUTES only).
+- `app/services/`: Business Logic (CRUD, formatting).
+- `app/models/`: SQLAlchemy implementation.
+- `app/config.py`: Configuration (Environment variables).
+
+## ⚠️ CRITICAL BEHAVIORS
+
+- **No Secrets**: Never hardcode credentials. Use `os.getenv`.
+- **Dashboard Integrity**: Ensure changes do not break the main dashboard UI.
+- **Dependencies**: If `pip install` is needed, update `app/requirements.txt`.
+- **Testing**: Verify logic with `docker-compose up` when possible.
+
+## COMMANDS TO RUN
+- **Lint**: `flake8 app/` (if available)
+- **Test**: `pytest` (if available)
