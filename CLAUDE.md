@@ -82,6 +82,51 @@ Use these workflows for common tasks:
 - `/add-module` - Add a new feature module (Model + Service + Controller)
 - `/run-local` - Set up and run locally
 - `/deploy-openshift` - Deploy to OpenShift
+- `/run-load-test` - Execute load tests on EC2 bastion
+
+## Load Testing
+
+The project includes a dedicated load testing infrastructure running on an **EC2 bastion host**.
+
+### Architecture
+
+```
+EC2 Bastion (Podman)
+├── InfluxDB (always-on) - Stores k6 metrics
+├── Grafana (always-on) - Visualizes metrics
+└── k6 (on-demand) - Executes load tests
+```
+
+### Components
+
+| Component | Container | Purpose | Status |
+|-----------|-----------|---------|--------|
+| **InfluxDB** | `k6-influxdb` | Time-series database for metrics | `restart: always` |
+| **Grafana** | `k6-grafana` | Dashboard for visualization | `restart: always` |
+| **k6** | `k6-load-test` | Load testing tool | `profiles: ["test"]` (manual) |
+
+### Running Load Tests
+
+Use the `/run-load-test` workflow:
+
+1. **Upload config**: `scp` docker-compose.yml and load_test.js to EC2
+2. **Start monitoring**: `podman-compose up -d` (starts InfluxDB + Grafana only)
+3. **Run test**: Execute k6 with `--network host` to connect to localhost:8086
+4. **View results**: Access Grafana at `http://ec2-43-210-23-187.ap-southeast-7.compute.amazonaws.com:3000`
+
+### Test Scenarios
+
+The `load_test.js` script includes:
+
+- **Functional Test**: Sequential CRUD operations (1 VU, 1 iteration)
+- **Load Test**: 10 requests/second for 1 minute (50-100 VUs)
+- **Thresholds**: <1% error rate, P95 latency <2000ms
+
+### Key Design Decisions
+
+- **Separation**: Monitoring tools (InfluxDB/Grafana) run continuously; k6 runs on-demand
+- **Host Networking**: k6 uses `--network host` to avoid Podman DNS issues
+- **Metrics Persistence**: InfluxDB stores all test results for historical analysis
 
 ## Dependencies
 

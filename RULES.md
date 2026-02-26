@@ -48,7 +48,32 @@ This section is automatically applied via `.cursorrules`.
 - **Modification**: When modifying code, ensure existing functionality (especially the dashboard) remains intact.
 - **Dependencies**: If adding new packages, update `app/requirements.txt` immediately.
 
-## 5. IDE Configuration Reference
+## 5. Load Testing Guidelines
+
+### Infrastructure
+
+- **Monitoring Stack**: InfluxDB and Grafana must run continuously (`restart: always`)
+- **Test Execution**: k6 runs on-demand only (via `profiles: ["test"]`)
+- **Networking**:
+  - Use `--network host` for k6 to connect to InfluxDB
+  - **Always use IPv4 addresses** (`127.0.0.1`) instead of `localhost` to avoid IPv6 resolution issues
+  - Never use IPv6 addresses (`::1`) in connection strings
+
+### Test Development
+
+- **Scenarios**: Separate functional tests from load tests
+- **Thresholds**: Define clear performance thresholds (error rate, latency)
+- **Metrics**: Use custom metrics for business-specific measurements
+- **Documentation**: Update `load_test.js` comments when changing test scenarios
+
+### Execution Rules
+
+1. **Always verify monitoring stack is running** before executing tests
+2. **Upload latest test scripts** to EC2 before running
+3. **Check Grafana dashboards** after tests to verify metrics were captured
+4. **Document performance baselines** for regression detection
+
+## 6. IDE Configuration Reference
 
 This project uses the following configuration files for IDE integration:
 

@@ -3,6 +3,8 @@ services:
   k6:
     image: grafana/k6:latest
     container_name: k6-load-test
+    profiles:
+      - test
     volumes:
       - ./load_test.js:/script.js:ro,z
     command: run --out influxdb=http://influxdb:8086/k6 /script.js
@@ -16,6 +18,7 @@ services:
   influxdb:
     image: influxdb:1.8
     container_name: k6-influxdb
+    restart: always
     ports:
       - "8086:8086"
     environment:
@@ -26,6 +29,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: k6-grafana
+    restart: always
     ports:
       - "3000:3000"
     environment:
