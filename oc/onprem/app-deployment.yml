@@ -1,0 +1,34 @@
+# App Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: rosa-poc
+  name: python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+        - name: app
+          image: harbor.krungsri.net/kscloud/rosa-app:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: app-config
+      imagePullSecrets:
+      - name: harbor-pull-secret

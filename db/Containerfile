@@ -1,14 +1,16 @@
 FROM mcr.microsoft.com/azure-sql-edge:latest
 
 USER root
-RUN mkdir -p /usr/config
-WORKDIR /usr/config
+RUN mkdir -p /usr/config && \
+    chown -R mssql:0 /usr/config && \
+    chmod -R g=u /usr/config
 
-# Copy the init script (for manual execution if needed)
+WORKDIR /usr/config
 COPY ./init-scripts/init.sql /usr/config/init.sql
 
-RUN chown -R mssql /usr/config
-USER mssql
+# Allow the random OpenShift user to read/write to the config dir
+RUN chown -R mssql:0 /usr/config && chmod -R g=u /usr/config
 
-# Start SQL Server
-CMD /opt/mssql/bin/sqlservr
+# Switch back to mssql user but ensure it's compatible
+USER 10001 
+CMD ["/opt/mssql/bin/sqlservr"]

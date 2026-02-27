@@ -45,3 +45,5 @@ See `.agent/workflows/deploy-openshift.md` for details or use the agent to help 
 ### 📝 Development Rules
 
 Please refer to [RULES.md](./RULES.md) for coding standards and contribution guidelines.
+
+oc login --token=sha256~i57Vb2PSpp1TCE6q2uRm-pnTAT6gymwOr6wPKamwI8Y --server=<https://api.hci-poc-bkk2.krungsri.net:6443> --insecure-skip-tls-verify

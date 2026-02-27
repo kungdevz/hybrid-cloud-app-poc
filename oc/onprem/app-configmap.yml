@@ -1,0 +1,9 @@
+# Application Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: rosa-poc
+  name: app-config
+data:
+  PROFILE: "test"
+  FLASK_APP: "app.app"
