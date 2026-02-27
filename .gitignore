@@ -10,3 +10,4 @@ certs
 
 oc/app-deployment.yml
 oc/onprem/app-route.yml
+app/config.yaml

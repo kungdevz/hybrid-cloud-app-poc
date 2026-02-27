@@ -1,2 +1,0 @@
-DATABASE_URI: 'mssql+pyodbc://hybrid_usr:%s=@192.168.66.147:9677/hybrid_poc?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes'
-DATABASE_PASSWORD: 'P@ssw0rd'
