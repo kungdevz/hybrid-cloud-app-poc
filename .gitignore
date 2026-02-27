@@ -8,6 +8,6 @@ load-test/key
 certs/
 certs
 
-# oc/app-deployment.yml
-oc/onprem/app-route.yml
+/oc/app-deployment.yml
+/oc/onprem/app-route.yml
 app/config.yaml
