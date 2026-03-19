@@ -1,0 +1,58 @@
+# Deployment: database
+# Runs an instance of Microsoft Azure SQL Edge (MSSQL) as the in-cluster database.
+# Used primarily for the "test" profile.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+  namespace: ks-hybrid-cloud-poc
+  labels:
+    app: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: mssql
+        image: mcr.microsoft.com/azure-sql-edge:latest
+        imagePullPolicy: Always
+        
+        # SQL Edge specific environment variables
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"                           # Accept End User License Agreement
+        - name: MSSQL_SA_PASSWORD
+          value: "c2E6U2VjcmV0I1Bhc3MxMjM="    # Base64 encoded password
+        - name: MSSQL_PID
+          value: "Developer"                   # Product ID (Developer Edition)
+          
+        ports:
+        - containerPort: 1433                  # Default MSSQL port
+          protocol: TCP
+          
+        # Security constraints: Azure SQL Edge requires root/fixed UID in some environments
+        securityContext:
+          allowPrivilegeEscalation: true
+          runAsUser: 0
+          
+        resources:
+          # Resources are currently empty (optional) but can be added here
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+
+        # Readiness Probe ensures pods only start receiving traffic when the DB is ready
+        readinessProbe:
+          tcpSocket:
+            port: 1433
+          initialDelaySeconds: 15
+          periodSeconds: 10

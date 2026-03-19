@@ -1,5 +1,5 @@
 ---
-description: Add a new feature module (Model, Service, Controller)
+inclusion: manual
 ---
 
 # Add New Module Workflow

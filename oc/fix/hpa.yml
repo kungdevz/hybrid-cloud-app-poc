@@ -1,0 +1,23 @@
+# HorizontalPodAutoscaler: python-app
+# Automatically scales the number of pods based on CPU utilization.
+#
+# NOTE: To use this, you must have the metrics-server installed in the cluster.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: python-app-hpa
+  namespace: ks-hybrid-cloud-poc
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: python-app
+  minReplicas: 1               # Scaling range floor
+  maxReplicas: 5               # Scaling range ceiling
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70 # Scale up if average CPU > 70%

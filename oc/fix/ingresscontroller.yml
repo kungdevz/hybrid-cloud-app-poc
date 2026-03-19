@@ -1,0 +1,43 @@
+# IngressController: hybrid-cloud-ingress
+# This defines a dedicated routing layer for the hybrid-cloud project.
+# In AWS, this triggers the OpenShift Ingress Operator to create an AWS Network Load Balancer (NLB).
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  name: hybrid-cloud-ingress
+  namespace: openshift-ingress-operator
+spec:
+  # The base domain assigned to this ingress controller.
+  # Routes using this controller will be subdomains of this.
+  domain: poc.apps.rosa.r0r7f1m1d7w4r0m.en6d.p3.openshiftapps.com
+  
+  # Only processes Routes in namespaces with this label.
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: ks-hybrid-cloud-poc
+
+  # Strategy for exposing the router to the internet/VPC.
+  endpointPublishingStrategy:
+    type: LoadBalancerService
+    loadBalancer:
+      scope: Internal           # "Internal" = Private NLB, "External" = Public NLB
+      providerParameters:
+        type: AWS
+        aws:
+          type: NLB             # Triggers creation of the AWS ARN: .../net/hybrid-cloud-nlb/...
+
+  # AWS LINKAGE CONFIGURATION:
+  # The Ingress Operator uses these annotations to configure the AWS NLB.
+  # Note: The specific ARN is assigned by AWS after this is applied.
+  # To map to a specific subnet or add tags, add them here:
+  serviceAnnotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    # Adding tags for better visibility in the AWS Console
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "Project=HybridCloud,Environment=POC,Owner=Krungsri"
+
+  replicas: 2
+
+  # Default TLS settings for this router layer
+  tlsProfile:
+    minTLSVersion: VersionTLS12

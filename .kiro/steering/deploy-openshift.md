@@ -1,5 +1,5 @@
 ---
-description: Deploy application to Red Hat OpenShift
+inclusion: manual
 ---
 
 # OpenShift Deployment Workflow
@@ -25,8 +25,6 @@ oc new-project ks-hybrid-cloud-poc
 
 ## 3. Apply Build Configuration
 
-// turbo
-
 ```bash
 oc apply -f oc/buildconfig.yml
 ```
@@ -44,8 +42,6 @@ oc start-build app-build --follow
 
 ## 5. Deploy the Application
 
-// turbo
-
 ```bash
 oc apply -f oc/app-deployment.yml
 ```
@@ -60,10 +56,7 @@ This creates:
 ## 6. Verify Deployment
 
 ```bash
-# Check pod status
 oc get pods
-
-# Get route URL
 oc get route app-route -o jsonpath='{.spec.host}'
 ```
 
@@ -78,24 +71,13 @@ oc logs -f deployment/python-app
 After code changes:
 
 ```bash
-# Trigger new build
 oc start-build app-build --follow
-
-# Rollout new deployment
 oc rollout restart deployment/python-app
 ```
 
 ## Configuration Updates
 
-Edit database credentials in `oc/app-deployment.yml`:
-
-```yaml
-data:
-  DATABASE_URI: "your-connection-string"
-  DATABASE_PASSWORD: "your-password"
-```
-
-Then apply:
+Edit database credentials in `oc/app-deployment.yml`, then:
 
 ```bash
 oc apply -f oc/app-deployment.yml

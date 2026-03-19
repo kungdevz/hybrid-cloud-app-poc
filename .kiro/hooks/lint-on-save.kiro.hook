@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Lint Python on Save",
+  "description": "Runs flake8 linting when a Python file is saved to catch style issues early",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.py"
+    ]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "flake8 --max-line-length=120 --exclude=__pycache__,venv,.venv app/"
+  }
+}

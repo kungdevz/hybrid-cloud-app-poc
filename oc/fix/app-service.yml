@@ -1,0 +1,17 @@
+# Service: app-service
+# Exposes the python-app pods internally within the cluster.
+# Type ClusterIP = only reachable inside the cluster (not from internet directly).
+# The Route resource (app-route.yml) uses this service to forward external traffic.
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+  namespace: ks-hybrid-cloud-poc
+spec:
+  type: ClusterIP               # Internal-only, not exposed externally
+  selector:
+    app: python-app             # Routes traffic to pods with this label
+  ports:
+    - port: 5000                # Port this service listens on (inside cluster)
+      targetPort: 5000          # Port on the pod container (Flask app)
+      protocol: TCP

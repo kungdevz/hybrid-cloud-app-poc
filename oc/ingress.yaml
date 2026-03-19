@@ -1,0 +1,19 @@
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  name: hybrid-cloud-ingress
+  namespace: openshift-ingress-operator
+spec:
+  domain: poc.apps.rosa.r0r7f1m1d7w4r0m.en6d.p3.openshiftapps.com
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: ks-hybrid-cloud-poc
+  endpointPublishingStrategy:
+    type: LoadBalancerService
+    loadBalancer:
+      scope: Internal
+      providerParameters:
+        type: AWS
+        aws:
+          type: NLB
+  replicas: 2

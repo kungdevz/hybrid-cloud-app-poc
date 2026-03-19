@@ -1,0 +1,16 @@
+# ConfigMap: app-config
+# Injects environment variables into the python-app container.
+# Referenced by app-deployment.yml via envFrom.configMapRef.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: ks-hybrid-cloud-poc
+data:
+  # Which database profile to use.
+  # "test"       -> connects to in-cluster database service (database:1433)
+  # "production" -> connects to external database (e.g. 192.168.66.147)
+  PROFILE: "test"
+
+  # The Flask application entry point (module:app)
+  FLASK_APP: "app.app"

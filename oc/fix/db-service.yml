@@ -1,0 +1,16 @@
+# Service: database
+# Exposes the MSSQL pod internally within the cluster.
+# The python-app uses this to connect to the DB when PROFILE="test".
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: ks-hybrid-cloud-poc
+spec:
+  type: ClusterIP            # Internal-only
+  selector:
+    app: database            # Connects to the database pod
+  ports:
+  - port: 1433               # Service port
+    targetPort: 1433         # Pod port
+    protocol: TCP

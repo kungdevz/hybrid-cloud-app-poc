@@ -1,0 +1,72 @@
+# Deployment: python-app
+# Runs the Flask web application inside OpenShift.
+# The container image is pulled from the internal OpenShift image registry.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+  namespace: ks-hybrid-cloud-poc
+spec:
+  replicas: 1                   # Number of running pods
+  selector:
+    matchLabels:
+      app: python-app           # Must match template.metadata.labels below
+
+  # Rolling update: replaces old pods gradually with new ones (zero-downtime)
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%             # Allow up to 25% extra pods during update
+      maxUnavailable: 25%       # Allow up to 25% pods to be unavailable
+
+  template:
+    metadata:
+      labels:
+        app: python-app         # Label used by Service selector to route traffic
+
+    spec:
+      containers:
+        - name: app
+          # Image built by OpenShift BuildConfig and stored internally
+          image: image-registry.openshift-image-registry.svc:5000/ks-hybrid-cloud-poc/app:latest
+          imagePullPolicy: Always   # Always pull latest image on pod start
+
+          ports:
+            - containerPort: 5000   # Flask default port
+
+          # Load all keys from ConfigMap as environment variables (PROFILE, FLASK_APP)
+          envFrom:
+            - configMapRef:
+                name: app-config
+
+          # Resource limits prevent one pod from consuming too much node capacity
+          resources:
+            requests:
+              cpu: 100m             # Minimum CPU guaranteed
+              memory: 128Mi         # Minimum memory guaranteed
+            limits:
+              cpu: 200m             # Maximum CPU allowed
+              memory: 256Mi         # Maximum memory allowed
+
+          # HEALTH CHECKS (Probes)
+          # These ensure that OpenShift knows if your app is healthy or if it needs to be restarted.
+          
+          # Readiness Probe: Is the app ready to receive traffic?
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+            
+          # Liveness Probe: Is the app still running? (Restarts if it fails)
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 5

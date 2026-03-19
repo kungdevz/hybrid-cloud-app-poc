@@ -25,7 +25,7 @@ Configuration is managed via `app/config.yaml` (default values) and Environment 
 The easiest way to run the application is using Docker Compose, which sets up both the Flask app and the MSSQL Edge database.
 
 ```bash
-docker-compose up --build
+podman-compose up --build
 ```
 
 Access the application at: `http://localhost:8081`
@@ -44,4 +44,11 @@ See `.agent/workflows/deploy-openshift.md` for details or use the agent to help 
 
 ### 📝 Development Rules
 
-Please refer to [RULES.md](./RULES.md) for coding standards and contribution guidelines.
+Coding standards and project guidelines are managed via Kiro steering files in `.kiro/steering/`.
+
+- `project-context.md` — Project overview, architecture, and API reference (always loaded)
+- `coding-standards.md` — PEP 8, type hints, project structure rules (always loaded)
+- `add-module.md` — Template for adding new feature modules (use `#add-module` in chat)
+- `deploy-openshift.md` — OpenShift deployment steps (use `#deploy-openshift` in chat)
+- `run-local.md` — Local development setup (use `#run-local` in chat)
+- `run-load-test.md` — Load testing on EC2 bastion (use `#run-load-test` in chat)

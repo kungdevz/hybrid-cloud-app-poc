@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "name": "Check Requirements on Write",
+  "description": "Reminds the agent to update requirements.txt when a new Python package import is added",
+  "version": "1",
+  "when": {
+    "type": "preToolUse",
+    "toolTypes": [
+      "write"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "If you are adding a new third-party import to a Python file, check if the package is listed in app/requirements.txt. If not, add it there as well."
+  },
+  "workspaceFolderName": "hybrid-cloud-app-poc",
+  "shortName": "check-requirements"
+}

@@ -1,15 +1,13 @@
 ---
-description: Set up and run the application locally
+inclusion: manual
 ---
 
 # Local Development Workflow
 
 ## Option 1: Docker Compose (Recommended)
 
-// turbo
-
 ```bash
-podman-compose up --build
+docker-compose up --build
 ```
 
 Access the app at <http://localhost:8081>
@@ -20,20 +18,16 @@ Access the app at <http://localhost:8081>
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # macOS/Linux
+source venv/bin/activate
 ```
 
 ### 2. Install dependencies
-
-// turbo
 
 ```bash
 cd app && pip install -r requirements.txt
 ```
 
 ### 3. Configure database connection
-
-Set environment variables:
 
 ```bash
 export DATABASE_URI='mssql+pyodbc://user:%s@host:port/db?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes'
@@ -51,13 +45,9 @@ flask db migrate
 flask db upgrade
 ```
 
-Or run the DDL script directly on MSSQL:
-
-- `db/init-scripts/init.sql`
+Or run the DDL script directly: `db/init-scripts/init.sql`
 
 ### 5. Run the application
-
-// turbo
 
 ```bash
 cd app && python app.py
@@ -66,8 +56,6 @@ cd app && python app.py
 Access the app at <http://localhost:5000>
 
 ## Verify Installation
-
-// turbo
 
 ```bash
 curl http://localhost:5000/users
