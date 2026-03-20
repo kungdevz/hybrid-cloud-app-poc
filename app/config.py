@@ -20,9 +20,13 @@ app.config['SESSION_FILE_DIR'] = session_dir
 app.config['SESSION_FILE_THRESHOLD'] = 200
 app.config['PERMANENT_SESSION_LIFETIME'] = 1800  # 30 minutes
 
-# Load config
-with open('config.yaml') as f:
-    config_obj = yaml.load(f, Loader=yaml.Loader)
+# Load config (optional - may not exist in container builds from git)
+config_yaml_path = os.path.join(os.path.dirname(__file__), 'config.yaml')
+try:
+    with open(config_yaml_path) as f:
+        config_obj = yaml.load(f, Loader=yaml.Loader) or {}
+except FileNotFoundError:
+    config_obj = {}
 
 # Profile-based configuration (local, test, production)
 # Priority: SQLALCHEMY_DATABASE_URI env var > PROFILE-based config > default (production)
