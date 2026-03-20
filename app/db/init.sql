@@ -1,12 +1,12 @@
 -- 1. Create the Database if it doesn't exist
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'hybrid_usr')
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'hybrid_poc')
 BEGIN
-    CREATE DATABASE [hybrid_usr];
+    CREATE DATABASE [hybrid_poc];
 END;
 GO
 
 -- 2. Switch context to the new database
-USE [hybrid_usr];
+USE [hybrid_poc];
 GO
 
 -- 3. Create the 'users' table using MSSQL syntax

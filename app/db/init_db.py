@@ -31,7 +31,7 @@ def _resolve_init_sql_path() -> str:
         os.path.join(os.path.dirname(__file__), relative)
     )
 
-    print("Resolve init sql path is : " + path)
+    print("Resolve init sql path is: " + path)
 
     if not os.path.exists(path):
         raise FileNotFoundError(f"init.sql not found at {path}")
@@ -61,11 +61,14 @@ def run_init_sql() -> bool:
     Returns:
         True if all batches executed successfully, False otherwise.
     """
+    database_name = os.getenv('DATABASE_SCHEMA', "hybrid_poc").lower()
+
     from config import get_odbc_connection_string
 
     try:
         sql_path = _resolve_init_sql_path()
-        print(f"init_sql >>> {sql_path}")
+        
+        print(f"init_sql >>> {sql_path} on database >>> {database_name}")
 
         with open(sql_path, 'r') as f:
             sql_content = f.read()
@@ -75,7 +78,7 @@ def run_init_sql() -> bool:
             print("No SQL batches found in init.sql")
             return False
 
-        conn_str = get_odbc_connection_string(database='master')
+        conn_str = get_odbc_connection_string(database=database_name)
         conn = pyodbc.connect(conn_str, autocommit=True)
         cursor = conn.cursor()
 
