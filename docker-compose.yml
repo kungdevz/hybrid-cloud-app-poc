@@ -26,7 +26,7 @@ services:
     ports:
       - "8081:5000"
     environment:
-      PROFILE: local
+      PROFILE: production
     networks:
       - app-network
 

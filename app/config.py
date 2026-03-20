@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import re
 import yaml
 import tempfile
 from flask import Flask
@@ -49,7 +50,7 @@ else:
             'password': config_obj.get('DATABASE_PASSWORD', '')
         }
     }
-    
+
     # Get config for the current profile, fallback to production
     db_config = database_configs.get(profile, database_configs['production'])
     
@@ -64,3 +65,50 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+
+def get_odbc_connection_string(database: str = 'master') -> str:
+    """Build a raw ODBC connection string from the current profile config.
+
+    Reuses the same credentials and host already resolved above so that
+    init_db.py doesn't need to re-parse the SQLAlchemy URI.
+
+    Args:
+        database: Target database name. Defaults to 'master' so that
+            init scripts can run CREATE DATABASE statements.
+
+    Returns:
+        An ODBC connection string suitable for pyodbc.connect().
+    """
+    sa_uri: str = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+
+    pattern = re.compile(
+        r'mssql\+pyodbc://(?P<user>[^:]+):(?P<password>[^@]+)'
+        r'@(?P<host>[^:]+):(?P<port>\d+)/(?P<db>[^?]+)'
+        r'(?:\?(?P<params>.*))?'
+    )
+    match = pattern.match(sa_uri)
+    if not match:
+        raise ValueError(f"Cannot parse database URI: {sa_uri}")
+
+    user = match.group('user')
+    password = match.group('password')
+    host = match.group('host')
+    port = match.group('port')
+    params = match.group('params') or ''
+
+    driver = 'ODBC Driver 18 for SQL Server'
+    for param in params.split('&'):
+        if param.lower().startswith('driver='):
+            driver = param.split('=', 1)[1].replace('+', ' ')
+            break
+
+    return (
+        f"DRIVER={{{driver}}};"
+        f"SERVER={host},{port};"
+        f"DATABASE={database};"
+        f"UID={user};"
+        f"PWD={password};"
+        f"Encrypt=yes;"
+        f"TrustServerCertificate=yes;"
+    )
