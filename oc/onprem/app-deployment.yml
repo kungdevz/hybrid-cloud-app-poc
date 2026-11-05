@@ -16,7 +16,10 @@ spec:
     spec:
       containers:
         - name: app
-          image: harbor.krungsri.net/kscloud/rosa-app:latest
+          # Set <HARBOR_REGISTRY> to your private registry host before applying
+          # (e.g. registry.example.internal). The harbor-pull-secret below must
+          # hold credentials for that same registry.
+          image: <HARBOR_REGISTRY>/kscloud/rosa-app:latest
           imagePullPolicy: Always
           resources:
             requests:

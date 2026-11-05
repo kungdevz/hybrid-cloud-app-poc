@@ -158,8 +158,13 @@ curl -sk -o /dev/null -w "HTTP %{http_code}\n" "https://$HOST/"   # expect 200
 
 ### On-prem OpenShift — `oc/onprem/`
 
-Namespace `rosa-poc`. The image is pulled from Harbor, so the
+Namespace `rosa-poc`. The image is pulled from a private Harbor registry, so the
 `harbor-pull-secret` imagePullSecret must exist in the namespace first.
+
+> The on-prem deployment manifests (`app-deployment.yml`, `mssql-deployment.yml`)
+> use a `<HARBOR_REGISTRY>` placeholder for the registry host. Replace it with
+> your private registry (e.g. `registry.example.internal`) before applying, and
+> make sure `harbor-pull-secret` holds credentials for that same registry.
 
 ```bash
 # 1. Log in to the on-prem cluster, then create / select the project

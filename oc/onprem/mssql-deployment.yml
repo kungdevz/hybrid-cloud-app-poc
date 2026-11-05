@@ -17,7 +17,9 @@ spec:
     spec:
       containers:
       - name: mssql
-        image: harbor.krungsri.net/kscloud/rosa-poc-db:latest
+        # Set <HARBOR_REGISTRY> to your private registry host before applying.
+        # Requires the harbor-pull-secret imagePullSecret in this namespace.
+        image: <HARBOR_REGISTRY>/kscloud/rosa-poc-db:latest
         ports:
         - containerPort: 1433
         env:
