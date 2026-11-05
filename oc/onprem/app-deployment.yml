@@ -27,8 +27,14 @@ spec:
               memory: 256Mi
           ports:
             - containerPort: 5000
+          # Load environment variables from both the ConfigMap and the Secret.
+          # ConfigMap (app-config): PROFILE, FLASK_APP, DATABASE_URI (no secrets).
+          # Secret (app-db-secret): DATABASE_PASSWORD (kept out of the ConfigMap).
+          # config.py substitutes DATABASE_PASSWORD into the "%s" in DATABASE_URI.
           envFrom:
             - configMapRef:
                 name: app-config
+            - secretRef:
+                name: app-db-secret
       imagePullSecrets:
       - name: harbor-pull-secret

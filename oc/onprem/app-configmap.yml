@@ -5,5 +5,16 @@ metadata:
   namespace: rosa-poc
   name: app-config
 data:
-  PROFILE: "test"
+  # Which database profile to use.
+  # "test"       -> connects to in-cluster database service (database:1433)
+  # "production" -> connects to external on-prem database (192.168.66.147)
+  PROFILE: "production"
+
+  # The Flask application entry point (module:app)
   FLASK_APP: "app.app"
+
+  # Production database connection (SQLAlchemy URI).
+  # The "%s" placeholder is filled by config.py with DATABASE_PASSWORD,
+  # which is injected separately from the app-db-secret Secret (never
+  # store the password in this ConfigMap).
+  DATABASE_URI: "mssql+pyodbc://hybrid_usr:%s@192.168.66.147:9677/hybrid_poc?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes"
