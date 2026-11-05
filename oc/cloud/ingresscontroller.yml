@@ -9,7 +9,7 @@ metadata:
 spec:
   # The base domain assigned to this ingress controller.
   # Routes using this controller will be subdomains of this.
-  domain: poc.apps.rosa.r0r7f1m1d7w4r0m.en6d.p3.openshiftapps.com
+  domain: poc.apps.rosa.n0w7a5w8g3j0z4e.en6d.p3.openshiftapps.com
   
   # Only processes Routes in namespaces with this label.
   namespaceSelector:
