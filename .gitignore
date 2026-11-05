@@ -12,3 +12,8 @@ certs
 /oc/app-deployment.yml
 /oc/onprem/app-route.yml
 app/config.yaml
+
+# Corporate CA bundle needed only for building behind the TLS-intercepting
+# proxy. Kept out of git; the Containerfile COPYs it, so place this file in
+# app/ locally before building an image that must trust the Krungsri proxy.
+app/krungsri-ca-bundle.crt
