@@ -10,14 +10,14 @@ RUN apt-get update && apt-get install -y \
     unixodbc-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 1b. Trust the corporate (Krungsri) CA so apt/curl work behind the
+# 1b. Trust the corporate CA so apt/curl work behind the
 #     TLS-intercepting proxy. Without this, apt rejects the Microsoft repo
 #     with "certificate issuer is unknown" and msodbcsql18 cannot be found.
-#     NOTE: krungsri-ca-bundle.crt is gitignored (not in the repo). Place it
+#     NOTE: ca-bundle.crt is gitignored (not in the repo). Place it
 #     in this app/ directory before building behind the proxy. On-cluster
 #     builds (OpenShift BuildConfig) that have the CA pre-trusted do not need
 #     this file; drop this COPY/RUN pair in that environment.
-COPY krungsri-ca-bundle.crt /usr/local/share/ca-certificates/krungsri-ca-bundle.crt
+COPY ca-bundle.crt /usr/local/share/ca-certificates/ca-bundle.crt
 RUN update-ca-certificates
 
 # 2. Add the Microsoft repo and install the ODBC driver. apt now trusts the
