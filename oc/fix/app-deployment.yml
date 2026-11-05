@@ -34,10 +34,15 @@ spec:
           ports:
             - containerPort: 5000   # Flask default port
 
-          # Load all keys from ConfigMap as environment variables (PROFILE, FLASK_APP)
+          # Load environment variables from both the ConfigMap and the Secret.
+          # ConfigMap (app-config): PROFILE, FLASK_APP, DATABASE_URI (no secrets).
+          # Secret (app-db-secret): DATABASE_PASSWORD (kept out of the ConfigMap).
+          # config.py substitutes DATABASE_PASSWORD into the "%s" in DATABASE_URI.
           envFrom:
             - configMapRef:
                 name: app-config
+            - secretRef:
+                name: app-db-secret
 
           # Resource limits prevent one pod from consuming too much node capacity
           resources:
