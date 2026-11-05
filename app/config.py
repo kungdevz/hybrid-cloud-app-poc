@@ -6,7 +6,7 @@ import tempfile
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, unquote_plus
 
 app = Flask(__name__)
 
@@ -95,8 +95,11 @@ def get_odbc_connection_string(database: str = 'master') -> str:
     if not match:
         raise ValueError(f"Cannot parse database URI: {sa_uri}")
 
-    user = match.group('user')
-    password = match.group('password')
+    # The SQLAlchemy URI stores credentials URL-encoded (via quote_plus),
+    # so decode them before placing them into the raw ODBC connection
+    # string; pyodbc treats PWD/UID literally and does not URL-decode.
+    user = unquote_plus(match.group('user'))
+    password = unquote_plus(match.group('password'))
     host = match.group('host')
     port = match.group('port')
     params = match.group('params') or ''
