@@ -13,7 +13,7 @@ deployed two ways from one codebase:
 | Environment | OpenShift | Namespace | Image source | Database |
 |-------------|-----------|-----------|--------------|----------|
 | **Cloud** | ROSA (AWS) | `ks-hybrid-cloud-poc` | In-cluster BuildConfig (builds from GitHub) → internal registry | On-prem MSSQL `192.168.66.147:9677` (over hybrid network) |
-| **On-prem** | On-prem OpenShift | `rosa-poc` | Harbor registry (`harbor.krungsri.net`) | On-prem MSSQL `192.168.66.147:9677` |
+| **On-prem** | On-prem OpenShift | `rosa-poc` | Private Harbor registry | On-prem MSSQL `192.168.66.147:9677` |
 
 Both environments run the `production` profile, so the app reaches the external
 on-prem SQL Server. The in-cluster MSSQL manifests are retained for the `test`
@@ -167,7 +167,7 @@ oc new-project rosa-poc
 
 # 2. Ensure the Harbor pull secret exists (prerequisite for image pulls)
 #    oc create secret docker-registry harbor-pull-secret \
-#      --docker-server=harbor.krungsri.net --docker-username=<u> --docker-password=<p> -n rosa-poc
+#      --docker-server=<harbor-registry> --docker-username=<u> --docker-password=<p> -n rosa-poc
 
 # 3. Apply config + secret
 oc apply -f oc/onprem/app-configmap.yml -n rosa-poc
