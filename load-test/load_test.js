@@ -36,7 +36,7 @@ export let options = {
     },
 };
 
-const BASE_URL = __ENV.BASE_URL || 'http://app-route-ks-hybrid-cloud-poc.apps.rosa.r0r7f1m1d7w4r0m.en6d.p3.openshiftapps.com';
+const BASE_URL = __ENV.BASE_URL || 'https://app-route-ks-hybrid-cloud-poc.apps.rosa.n0w7a5w8g3j0z4e.en6d.p3.openshiftapps.com';
 
 function generateRandomString(length) {
     let result = '';
@@ -59,10 +59,10 @@ export default function () {
 
         let res = http.post(`${BASE_URL}/users`, payload, params);
 
-        check(res, {
+        ErrorRate.add(!check(res, {
             'POST status is 200': (r) => r.status === 200,
             'User created': (r) => r.json('handle') === userHandle,
-        }) || ErrorRate.add(1);
+        }));
 
         ApiLatency.add(res.timings.duration);
 
@@ -74,11 +74,13 @@ export default function () {
 
         if (userId) {
             // 2. Read User (GET) -> Read-after-write check
-            res = http.get(`${BASE_URL}/users/${userId}`);
-            check(res, {
+            // A fixed `name` tag keeps one InfluxDB series per endpoint instead
+            // of one per user id (k6 defaults `name` to the full URL).
+            res = http.get(`${BASE_URL}/users/${userId}`, { tags: { name: 'GET /users/{id}' } });
+            ErrorRate.add(!check(res, {
                 'GET status is 200': (r) => r.status === 200,
                 'User data matches': (r) => r.json('handle') === userHandle,
-            }) || ErrorRate.add(1);
+            }));
             ApiLatency.add(res.timings.duration);
 
             sleep(1);
@@ -86,21 +88,24 @@ export default function () {
             // 3. Update User (PUT)
             let updatedHandle = `${userHandle}_updated`;
             payload = JSON.stringify({ handle: updatedHandle });
-            res = http.put(`${BASE_URL}/users/${userId}`, payload, params);
+            res = http.put(`${BASE_URL}/users/${userId}`, payload, {
+                headers: params.headers,
+                tags: { name: 'PUT /users/{id}' },
+            });
 
-            check(res, {
+            ErrorRate.add(!check(res, {
                 'PUT status is 200': (r) => r.status === 200,
                 'User updated': (r) => r.json('handle') === updatedHandle,
-            }) || ErrorRate.add(1);
+            }));
             ApiLatency.add(res.timings.duration);
 
             sleep(1);
 
             // 4. Delete User (DELETE)
-            res = http.del(`${BASE_URL}/users/${userId}`);
-            check(res, {
+            res = http.del(`${BASE_URL}/users/${userId}`, null, { tags: { name: 'DELETE /users/{id}' } });
+            ErrorRate.add(!check(res, {
                 'DELETE status is 200': (r) => r.status === 200,
-            }) || ErrorRate.add(1);
+            }));
             ApiLatency.add(res.timings.duration);
         }
     });
@@ -108,9 +113,9 @@ export default function () {
     // Simple List Users (Pagination simulation - just listing all for now as pagination not implemented in API)
     group('List Users', function () {
         let res = http.get(`${BASE_URL}/users`);
-        check(res, {
+        ErrorRate.add(!check(res, {
             'List status is 200': (r) => r.status === 200,
-        }) || ErrorRate.add(1);
+        }));
         ApiLatency.add(res.timings.duration);
     });
 }

@@ -1,7 +1,14 @@
 apiVersion: 1
 
+# Recreate the datasource on startup so its fixed uid is applied even if an
+# older copy (with an auto-generated uid) already exists in grafana-data.
+deleteDatasources:
+  - name: InfluxDB
+    orgId: 1
+
 datasources:
   - name: InfluxDB
+    uid: influxdb-k6          # Referenced by the provisioned k6 dashboard
     type: influxdb
     access: proxy
     url: http://influxdb:8086
